@@ -1,0 +1,77 @@
+//Source: CppNuts
+
+void fun(int count) {
+    while (count -- > 0) {
+        cout<< "cout is :" << count << endl;
+    }
+   sleep(5);
+}
+
+int main() {
+
+    cout << "in main " << endl;
+    thread t1(fun, 10);
+    //t1.join();
+    cout << "after join" << endl;
+
+    return 0;
+}
+
+
+So if we do not write t1.join, program will terminate with abort. Why ?
+
+So when thread object is created (thread t1()), by default kernel makes it joinable. But when thread object desctructor is called, it checks if thread is still joinable. And if it is,
+it terminates the program. 
+
+So we need to write t1.join()  => Now thread t1 is no more joinable. As in u can't call t1.join again in the program.
+
+****** t1.detach() **********
+
+When we call t1.detach() in place of t1.join(), this gets detach from parent thread. 
+
+void fun(int count) {
+    while (count -- > 0) {
+        cout<< "cout is :" << count << endl;
+    }
+   sleep(5);
+
+   cout << "after sleep " << endl;
+}
+
+int main() {
+
+    cout << "in main " << endl;
+    thread t1(fun, 10);
+    t1.detach();
+    cout << "after join" << endl;
+
+    return 0;
+}
+
+Here "after sleep" will never be printed, because till that time main thread gets chance to exectue and it will terminate. So detach thread will get suspended.
+
+
+
+
+
+
+What will happen here ?
+
+
+int main() {
+
+    cout << "in main " << endl;
+    thread t1(fun, 10);
+    t1.join();
+    t1.detach();
+    cout << "after join" << endl;
+
+    return 0;
+}
+
+
+Program will terminate as soon as t1.detach() is called. Why ?
+Beacuse after t1.join(), the t1 thread is not joinable. So you can't call join/detach after that.
+
+
+
