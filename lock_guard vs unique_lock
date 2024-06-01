@@ -1,0 +1,39 @@
+lock_guard vs unique_lock/
+
+What is lock_guard ?
+
+#include <iostream>
+#include <thread>
+#include <mutex>
+
+using namespace std;
+
+mutex m;
+void myFun(const char *str) {
+
+   lock_guard<mutex> lg(m);
+   cout << " In for " << str << endl;
+   for(int i = 0; i < 10; i++) {
+      cout << " i -> " << i;
+   }
+   cout << endl;
+}
+
+int main () {
+
+   thread t1(myFun, "T0");
+   thread t2(myFun, "T1");
+   t1.join();
+   t2.join();
+   return 0;
+
+}
+
+Lock Guard acquires the mutex, but it releases when function returns here. (where it goes out of scope). We can't manually unlock the lock_guard.
+
+============================================================================================================
+
+What is unique_lock ?
+
+Unique_lock is bloated one with lot of features like defer lock, try lock for sometime etc. But one good thing here is that it can be manually unlock and lock again.
+This will be useful in condition variable case
