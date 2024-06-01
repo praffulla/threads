@@ -1,0 +1,55 @@
+
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
+using namespace std;
+
+mutex m;
+condition_variable cv;
+int balance = 0;
+
+bool isSomeBal() {
+   return (balance > 0);
+}
+
+void addMoney(int amount) {
+
+   lock_guard<mutex> lg(m);
+   balance = balance + amount;
+   cout << " added and now balance is " << balance << endl;
+   cv.notify_one();
+
+}
+
+void withdrawMoney(int amount) {
+
+   cout << "inside withdrawl " << endl;
+   unique_lock<mutex> ul(m);
+   cv.wait(ul, isSomeBal);
+   balance = balance - amount;
+   cout << " withdrawed and now balance is " << balance << endl;
+
+
+}
+
+int main () {
+
+   thread t1(addMoney, 500);
+   thread t2(withdrawMoney, 500);
+   t1.join();
+   t2.join();
+   return 0;
+
+}
+
+
+
+What is condition variable ?
+
+  When you want to change the critical section only when certain condition holds. Here do not want to withdraw money if balance is 0.
+  In line number 30, t2 sees that balance is 0, so predicate fails and it releases the lock. So wait() releases the lock if condition fails and put thread to sleep.
+  When in line 22, notify_one is called, then OS wakes up t2, t2 again try to acquire the lock and checks the wait condition. If true, it will go inside.
+  
+  
