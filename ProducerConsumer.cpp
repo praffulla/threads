@@ -4,6 +4,8 @@ Here are three conditions:
 2. Producer can't produce more if buffer is full;
 3. Consumer can't consume more if buffer is empty;
 
+Now you can see that both producer and consumer has to signal each other for above two condition. So need a condition variable.
+
 #include <iostream>
 #include <thread>
 #include <queue>
